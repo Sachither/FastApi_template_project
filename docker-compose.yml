@@ -1,0 +1,56 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: template_test_api:${TEMPLATE_TEST_API_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      TEMPLATE_TEST_API_HOST: 0.0.0.0
+      TEMPLATE_TEST_API_DB_HOST: template_test_api-db
+      TEMPLATE_TEST_API_DB_PORT: 5432
+      TEMPLATE_TEST_API_DB_USER: template_test_api
+      TEMPLATE_TEST_API_DB_PASS: template_test_api
+      TEMPLATE_TEST_API_DB_BASE: template_test_api
+      TEMPLATE_TEST_API_REDIS_HOST: template_test_api-redis
+
+  db:
+    image: postgres:16.3-bullseye
+    hostname: template_test_api-db
+    environment:
+      POSTGRES_PASSWORD: "template_test_api"
+      POSTGRES_USER: "template_test_api"
+      POSTGRES_DB: "template_test_api"
+    volumes:
+      - template_test_api-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U template_test_api
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  redis:
+    image: bitnami/redis:6.2.5
+    hostname: "template_test_api-redis"
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
+
+
+
+volumes:
+  template_test_api-db-data:
+    name: template_test_api-db-data

@@ -38,7 +38,7 @@ services:
       retries: 40
 
   redis:
-    image: bitnami/redis:6.2.5
+    image: bitnami/redis:latest
     hostname: "template_test_api-redis"
     restart: always
     environment:

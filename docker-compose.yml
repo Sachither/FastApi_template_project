@@ -40,6 +40,8 @@ services:
   redis:
     image: bitnami/redis:7.4.0-debian-12-r0
     hostname: "template_test_api-redis"
+    ports:
+      - "6379:6379"
     restart: always
     environment:
       ALLOW_EMPTY_PASSWORD: "yes"

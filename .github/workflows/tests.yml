@@ -38,6 +38,12 @@ jobs:
         uses: KengoTODA/actions-setup-docker-compose@v1
         with:
           version: "2.28.0"
-      - name: run tests
+      - name: Pull Docker images
+        run: docker-compose pull  # Ensures images are pulled
+      - name: Start services
+        run: docker-compose up -d  # Starts db and redis in background
+      - name: Run tests
         run: docker-compose run --rm api pytest -vv
+      - name: Stop services
+        run: docker-compose down  # Clean up after tests
 
